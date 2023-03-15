@@ -1,6 +1,10 @@
+using HotelListings.Api.Configurations;
+using HotelListings.Api.Contracts;
 using HotelListings.Api.Data;
+using HotelListings.Api.Repository;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +31,11 @@ builder.Services.AddCors(options =>
 
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 //invoking ctx instance of builder for use inside the method above. LC (logger configuration) writing to console reading from the config
+
+builder.Services.AddAutoMapper(typeof(MapperConfig)); //adding automapper to out inversion control container(controller) for app. Can inject anywhere
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 
 var app = builder.Build();
 
