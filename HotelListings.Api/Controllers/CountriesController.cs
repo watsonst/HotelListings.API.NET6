@@ -20,11 +20,13 @@ namespace HotelListings.Api.Controllers
 
         private readonly IMapper _mapper;
         private readonly ICountriesRepository _countriesRepository;
+        private readonly ILogger<CountriesController> _logger;
 
-        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository) // ICRepo now injects db context
+        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger) // ICRepo now injects db context
         {
             this._mapper = mapper;
             this._countriesRepository = countriesRepository;
+            this._logger = logger;
         }
 
         // GET: api/Countries "action"
@@ -44,6 +46,7 @@ namespace HotelListings.Api.Controllers
             
             if (country == null)
             {
+                _logger.LogWarning($"No Record found in {nameof(GetCountries)} with Id: {id}. "); //name of good way to reduce number of typos
                 return NotFound();
             }
             
