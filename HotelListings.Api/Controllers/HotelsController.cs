@@ -9,6 +9,7 @@ using HotelListings.Api.Data;
 using HotelListings.Api.Contracts;
 using AutoMapper;
 using HotelListings.Api.Models.Hotel;
+using HotelListings.Api.Exceptions;
 
 namespace HotelListings.Api.Controllers
 {
@@ -41,7 +42,7 @@ namespace HotelListings.Api.Controllers
 
             if (hotel == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(GetHotel), id);
             }
 
             return Ok(_mapper.Map<HotelDto>(hotel));
@@ -54,14 +55,14 @@ namespace HotelListings.Api.Controllers
         {
             if (id != hotelDto.Id)
             {
-                return BadRequest("Invalid record Id");
+                throw new BadRequestException(nameof(PutHotel), id);
             }
 
             var hotel = await _hotelsRepository.GetAsync(id);
             
             if (hotel == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(GetHotel), id);
             }
 
             _mapper.Map(hotelDto, hotel);
@@ -75,7 +76,7 @@ namespace HotelListings.Api.Controllers
             {
                 if (!await HotelExists(id))
                 {
-                    return NotFound();
+                    throw new NotFoundException(nameof(HotelExists), id);
                 }
                 else
                 {
@@ -106,7 +107,7 @@ namespace HotelListings.Api.Controllers
 
             if (hotel == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(GetHotel), id);
             }
 
             await _hotelsRepository.DeleteAsync(id);

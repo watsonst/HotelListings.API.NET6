@@ -28,27 +28,17 @@ namespace HotelListings.Api.Controllers
         public async Task<ActionResult> Register([FromBody]ApiUserDto apiUserDto)
         {
             _logger.LogInformation($"Registration Attempt for {apiUserDto.Email}"); //when introducing logging, also use more try/catch to catch issues and mitigate against any unwanted failures and catch the details.
+            var errors = await _authManager.Register(apiUserDto);
 
-            try
+            if (errors.Any())
             {
-                var errors = await _authManager.Register(apiUserDto);
-
-                if (errors.Any())
+                foreach (var error in errors)
                 {
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(error.Code, error.Description);
-                    }
-                    return BadRequest(ModelState);
+                    ModelState.AddModelError(error.Code, error.Description);
                 }
-                return Ok();
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something Went Wrong in the {nameof(Register)} - User Registration attempt for {apiUserDto.Email}"); //Just siting the name of the method for reference
-                return Problem($"Something Went Wrong in the {nameof(Register)}. Please contact support", statusCode: 500); //Problem just a return type object like bad request or Ok. This is the message sent back with 500
-            }
-
+            return Ok();
         }
 
         // api/Account/login
@@ -60,23 +50,14 @@ namespace HotelListings.Api.Controllers
         public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
         {
             _logger.LogInformation($"Login Attempt for {loginDto.Email}");
+            var authResponse = await _authManager.Login(loginDto);
 
-            try
+            if (authResponse == null)
             {
-                var authResponse = await _authManager.Login(loginDto);
-
-                if (authResponse == null)
-                {
-                    return Unauthorized();
-                }
-
-                return Ok(authResponse);
+                return Unauthorized();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something Went Wrong in the {nameof(Login)} - User Login for {loginDto.Email}");
-                return Problem($"Something Went Wrong in the {nameof(Login)} - Please contact support", statusCode: 500);
-            }
+
+            return Ok(authResponse);
            
         }
 

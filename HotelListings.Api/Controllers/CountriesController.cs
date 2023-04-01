@@ -10,6 +10,7 @@ using HotelListings.Api.Models.Country;
 using AutoMapper;
 using HotelListings.Api.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using HotelListings.Api.Exceptions;
 
 namespace HotelListings.Api.Controllers
 {
@@ -38,6 +39,7 @@ namespace HotelListings.Api.Controllers
             return Ok(records);
         }
 
+
         // GET: api/Countries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryDto>> GetCountry(int id)
@@ -46,14 +48,14 @@ namespace HotelListings.Api.Controllers
             
             if (country == null)
             {
-                _logger.LogWarning($"No Record found in {nameof(GetCountries)} with Id: {id}. "); //name of good way to reduce number of typos
-                return NotFound();
+                throw new NotFoundException(nameof(GetCountry), id);
             }
             
             var countryDto = _mapper.Map<CountryDto>(country);
 
             return Ok(countryDto);
         }
+
 
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -63,36 +65,37 @@ namespace HotelListings.Api.Controllers
         {
             if (id != updateCountryDto.Id)
             {
-                return BadRequest("Invalid record Id");
+                throw new BadRequestException(nameof(PutCountry), id);
             }
 
             var country = await _countriesRepository.GetAsync(id);
                 
             if (country == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(GetCountry), id);
             }
 
-            _mapper.Map(updateCountryDto, country); //everything from left object is put into right object
+            _mapper.Map(updateCountryDto, country);
 
             try
             {
                 await _countriesRepository.UpdateAsync(country);
             }
+
             catch (DbUpdateConcurrencyException)
             {
                 if (!await CountryExists(id))
                 {
-                    return NotFound();
+                    throw new NotFoundException(nameof(CountryExists), id);
                 }
                 else
                 {
                     throw;
                 }
             }
-
             return NoContent();
         }
+
 
         // POST: api/Countries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -116,7 +119,7 @@ namespace HotelListings.Api.Controllers
 
             if (country == null)
             {
-                return NotFound();
+               throw new NotFoundException(nameof(GetCountry), id);
             }
 
             await _countriesRepository.DeleteAsync(id);

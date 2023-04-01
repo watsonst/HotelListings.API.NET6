@@ -1,6 +1,7 @@
 using HotelListings.Api.Configurations;
 using HotelListings.Api.Contracts;
 using HotelListings.Api.Data;
+using HotelListings.Api.MiddleWare;
 using HotelListings.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -68,12 +69,15 @@ builder.Services.AddAuthentication(options => {
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline. Everything below is a middleware or sub application to run on pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//going to create own sub application in pipeline that will be watching for ex being thrown, auto assess what kind of ex, and give appropriate return value
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
