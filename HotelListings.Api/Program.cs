@@ -47,7 +47,7 @@ builder.Services.AddApiVersioning(options => {
     options.ReportApiVersions = true;
     options.ApiVersionReader = ApiVersionReader.Combine(
         new QueryStringApiVersionReader("api-version"),///api/countries?api-version=1
-        new HeaderApiVersionReader("X-Version"),// In header Key=X-Version value = 1
+        new HeaderApiVersionReader("X-Version"),//In header Key=X-Version value = 1
         new MediaTypeApiVersionReader("ver")
     );
 });
@@ -86,6 +86,12 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
+builder.Services.AddResponseCaching(options =>
+{
+    options.MaximumBodySize = 1024; //in bytes, 1mb
+    options.UseCaseSensitivePaths = true;
+});
+
 
 var app = builder.Build();
 
@@ -102,6 +108,23 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseResponseCaching(); //enable middleware
+
+//create code for middleware directly in progam.cs below vs ExceptionMiddleware. two ways.
+app.Use(async (context, next) =>
+{
+    context.Response.GetTypedHeaders().CacheControl =
+        new Microsoft.Net.Http.Headers.CacheControlHeaderValue()//certain header values that are returned to denote data coming from cach rather than fresh data
+        {
+            Public = true,
+            MaxAge = TimeSpan.FromSeconds(10)//every ten seconds the data is refreshed. Set time based on needs. Useful for endpoint that don't change as much.
+        };
+    context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+        new string[] { "Accept-Encoding" };//vary header used to vary the cach response. Willing to cache a variety of data types
+
+    await next();
+});
 
 app.UseAuthentication();
 
