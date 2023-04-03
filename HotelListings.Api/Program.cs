@@ -5,6 +5,8 @@ using HotelListings.Api.MiddleWare;
 using HotelListings.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -38,6 +40,24 @@ builder.Services.AddCors(options =>
         .AllowAnyOrigin()
         .AllowAnyMethod());
 });
+
+builder.Services.AddApiVersioning(options => {
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),///api/countries?api-version=1
+        new HeaderApiVersionReader("X-Version"),// In header Key=X-Version value = 1
+        new MediaTypeApiVersionReader("ver")
+    );
+});
+
+builder.Services.AddVersionedApiExplorer(
+    options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
 
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 //invoking ctx instance of builder for use inside the method above. LC (logger configuration) writing to console reading from the config

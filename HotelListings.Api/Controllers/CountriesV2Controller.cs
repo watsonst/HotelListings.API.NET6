@@ -16,16 +16,16 @@ namespace HotelListings.Api.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/countries")]
-    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("2.0")]
 
-    public class CountriesController : ControllerBase
+    public class CountriesV2Controller : ControllerBase
     {
 
         private readonly IMapper _mapper;
         private readonly ICountriesRepository _countriesRepository;
         private readonly ILogger<CountriesController> _logger;
 
-        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger) // ICRepo now injects db context
+        public CountriesV2Controller(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger) // ICRepo now injects db context
         {
             this._mapper = mapper;
             this._countriesRepository = countriesRepository;
