@@ -11,6 +11,7 @@ using AutoMapper;
 using HotelListings.Api.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using HotelListings.Api.Exceptions;
+using HotelListings.Api.Models;
 
 namespace HotelListings.Api.Controllers
 {
@@ -32,8 +33,8 @@ namespace HotelListings.Api.Controllers
             this._logger = logger;
         }
 
-        // GET: api/Countries "action"
-        [HttpGet]
+        // GET: api/Countries/GetAll "action"
+        [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
             var countries = await _countriesRepository.GetAllAsync();
@@ -41,22 +42,45 @@ namespace HotelListings.Api.Controllers
             return Ok(records);
         }
 
+        // GET: api/Countries/?StartIndex=0&pagesize=25&PageNumber=1
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<GetCountryDto>>> GetPagedCountries([FromQuery] QueryParameters queryParameters)
+        {
+            var pagedCountriesResult = await _countriesRepository.GetAllAsync<CountryDto>(queryParameters);//mapping done at DB level in genericRepo.cs
+            return Ok(pagedCountriesResult);
+        }
 
         // GET: api/Countries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryDto>> GetCountry(int id)
         {
             var country = await _countriesRepository.GetDetails(id);
-            
+
             if (country == null)
             {
                 throw new NotFoundException(nameof(GetCountry), id);
             }
-            
+
             var countryDto = _mapper.Map<CountryDto>(country);
 
             return Ok(countryDto);
         }
+
+        //// GET: api/Countries/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<CountryDto>> GetCountry(int id)
+        //{
+        //    var country = await _countriesRepository.GetDetails(id);//if mapped at db level in genericRepo.cs, get details would return countrydto and 65 mapping not needed
+            
+        //    if (country == null)
+        //    {
+        //        throw new NotFoundException(nameof(GetCountry), id);
+        //    }
+            
+        //    var countryDto = _mapper.Map<CountryDto>(country);
+
+        //    return Ok(countryDto);
+        //}
 
 
         // PUT: api/Countries/5
