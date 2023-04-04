@@ -11,6 +11,7 @@ using AutoMapper;
 using HotelListings.Api.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using HotelListings.Api.Exceptions;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace HotelListings.Api.Controllers
 {
@@ -33,7 +34,12 @@ namespace HotelListings.Api.Controllers
         }
 
         // GET: api/Countries "action"
+        //.../api/v2/Countries?$Select=name,shortname
+        //...api/v2/Countries?$filter=name eq 'Cuba'
+        //...api/v2/Countries?$orderby=name
+        //...api/v2/Countries?$select=name&$orderby=name
         [HttpGet]
+        [EnableQuery]//OData- can allow your users to search,sort,orderby,etc if you want them to be able to in the query
         public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
             var countries = await _countriesRepository.GetAllAsync();
