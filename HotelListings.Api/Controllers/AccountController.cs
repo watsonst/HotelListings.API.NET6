@@ -1,8 +1,6 @@
-﻿using HotelListings.Api.Contracts;
-using HotelListings.Api.Models.Users;
-using Microsoft.AspNetCore.Http;
+﻿using HotelListings.API.Core.Contracts;
+using HotelListings.API.Core.Models.Users;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace HotelListings.Api.Controllers
 {

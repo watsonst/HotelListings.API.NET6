@@ -1,8 +1,8 @@
-using HotelListings.Api.Configurations;
-using HotelListings.Api.Contracts;
 using HotelListings.Api.Data;
-using HotelListings.Api.MiddleWare;
-using HotelListings.Api.Repository;
+using HotelListings.API.Core.Configurations;
+using HotelListings.API.Core.Contracts;
+using HotelListings.API.Core.MiddleWare;
+using HotelListings.API.Core.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using System.ComponentModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
