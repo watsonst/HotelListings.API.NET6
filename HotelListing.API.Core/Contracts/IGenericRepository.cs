@@ -14,7 +14,7 @@ namespace HotelListings.API.Core.Contracts
         Task<TResult> AddAsync<TSource, TResult>(TSource source);//want dto to come into the repo. tsource = paramater tresult = expected return type
         Task DeleteAsync(int id);
         Task UpdateAsync(T entity);
-        Task UpdateAsync<TSource, TResult>(int id, TSource source);//get source(dto object) and take id
+        Task UpdateAsync<TSource>(int id, TSource source);//get source(dto object) and take id
         Task<bool> Exists(int id);
 
     }
